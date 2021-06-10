@@ -1,16 +1,40 @@
 import React, { useState } from "react";
+import axios from "axios";
+
 import "./Form.css";
 
 const Form = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [dob, setDob] = useState("");
+  const [userInfo, setUserInfo] = useState({
+    name: "",
+    email: "",
+    birthDate: "",
+  });
+  const [emailConsent, setEmailConsent] = useState(false);
+  console.log("consent", emailConsent);
 
-  const handleSubmit = (evt) => {
-    evt.preventDefault();
-    console.log(`Submitting Name ${name}`);
-    console.log(`Submitting Emil ${email}`);
-    console.log(`Submitting Date of Birth ${dob}`);
+  const handleChange = (e) => {
+    setUserInfo({ ...userInfo, [e.target.name]: e.target.value });
+  };
+
+  const clear = () => {
+    setUserInfo({ name: "", email: "", birthDate: "" });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    axios
+      .post(
+        "https://my-json-server.typicode.com/JustUtahCoders/interview-users-api/users",
+        { ...userInfo, emailConsent }
+      )
+      .then(function (response) {
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+
+    clear();
   };
 
   return (
@@ -18,32 +42,40 @@ const Form = () => {
       <form onSubmit={handleSubmit}>
         <input
           id="name"
+          name="name"
           type="text"
           placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={userInfo.name}
+          onChange={handleChange}
         />
         <input
           id="email"
+          name="email"
           type="text"
           placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={userInfo.email}
+          onChange={handleChange}
         />
         <input
-          id="dob"
+          id="birthDate"
+          name="birthDate"
           type="text"
           placeholder="00/00/0000"
-          value={dob}
-          onChange={(e) => setDob(e.target.value)}
+          value={userInfo.birthDate}
+          onChange={handleChange}
         />
 
         <div className="terms">
-          <input id="terms" type="checkbox" />
+          <input
+            id="terms"
+            type="checkbox"
+            onChange={() => setEmailConsent(!emailConsent)}
+            checked={emailConsent}
+          />
           <label>I agree to be contacted via email</label>
         </div>
 
-        <button>Clear</button>
+        <button onClick={clear}>Clear</button>
         <input type="submit" value="submit" />
       </form>
     </div>
